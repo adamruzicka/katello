@@ -30,10 +30,6 @@ module Glue::Candlepin::Content
       if self.new_record? && !self.content_view.default?
         return
       end
-
-      if !self.new_record? && should_update_content?
-        pre_queue.create(:name => "update content : #{self.name}", :priority => 2, :action => [self, :update_content])
-      end
     end
 
     def update_environment_content
