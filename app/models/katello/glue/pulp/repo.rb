@@ -21,7 +21,7 @@ module Glue::Pulp::Repo
 
     base.class_eval do
 
-      before_save :save_repo_orchestration
+#      before_save :save_repo_orchestration
 
       lazy_accessor :pulp_repo_facts,
                     :initializer => (lambda do |s|
@@ -66,12 +66,6 @@ module Glue::Pulp::Repo
   end
 
   module InstanceMethods
-    def pulp_update_needed?
-      ((self.respond_to?(:feed) && self.feed_changed?) ||
-       (self.respond_to?(:unprotected) && self.unprotected_changed?)) &&
-      !self.product.provider.redhat_provider?
-    end
-
     def last_sync
       self.importers.first["last_sync"] if self.importers.first
     end

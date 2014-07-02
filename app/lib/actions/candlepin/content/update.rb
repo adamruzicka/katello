@@ -23,7 +23,7 @@ module Actions
           param :type
           param :vendor
         end
-
+        
         def run
 	  content = ::Katello::Candlepin::Content.find(input[:content_id])
           content.update(:name => input[:name],
@@ -31,8 +31,7 @@ module Actions
                          :gpgUrl => input[:gpg_url],
                          :label => input[:label],
                          :type => input[:type],
-                         :vendor => input[:vendor]
-                         )
+                         :vendor => input[:vendor])
         end
       end
     end

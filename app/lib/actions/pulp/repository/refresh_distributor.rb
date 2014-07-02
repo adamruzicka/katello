@@ -22,10 +22,8 @@ module Actions
         end
 
         def run
-          output[:response] = ::Katello.pulp_server.extensions.repository.update_distributor(input[:repo_id],
-                                                                                           input[:id],
-                                                                                           input[:config]
-                                                                                           )
+          output[:response] = ::Katello.pulp_server.extensions.repository.
+            update_distributor(*input.values_at(:repo_id, :id, :config))
         end
       end
     end
