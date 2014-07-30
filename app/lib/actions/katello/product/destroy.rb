@@ -15,6 +15,10 @@ module Actions
     module Product
       class Destroy < Actions::EntryAction
 
+        input_format do
+          param :id
+        end
+        
         # rubocop:disable MethodLength
         def plan(product)
 
@@ -27,11 +31,14 @@ module Actions
           action_subject(product)
 
           sequence do
-            concurrence do
-              product.repositories.in_default_view.each do |repo|
-                plan_action(Katello::Repository::Destroy, repo)
-              end
-            end
+            # concurrence do
+            #   product.repositories.in_default_view.each do |repo|
+            #     plan_action(Katello::Repository::Destroy, repo)
+            #   end
+            # end
+            plan_action(::Actions::Katello::PerformBulkAction,
+                        ::Actions::Katello::Repository::Destroy,
+                        product.repositories.in_default_view)
             concurrence do
               plan_action(Candlepin::Product::DeletePools,
                             cp_id: product.cp_id, organization_label: product.organization.label)
@@ -53,9 +60,14 @@ module Actions
               plan_action(Candlepin::Product::Destroy, cp_id: product.cp_id)
             end
 
-            product.reload.destroy!
+            plan_self(:id => product.id)
             plan_action(ElasticSearch::Reindex, product)
           end
+        end
+
+        def finalize
+          product = ::Katello::Product.find_by_id(input[:id])
+          product.destroy!
         end
 
         def humanized_name
