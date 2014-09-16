@@ -183,6 +183,7 @@ module Glue
         mapping = @obj_class.mapping || {}
         if mapping[sort_by.to_sym] && mapping[sort_by.to_sym][:type] == 'date'
           sort_by
+        elsif sort_by == 'id'
         else
           sort_by + '_sort' if !sort_by.to_s.include?('_sort')
         end
