@@ -5,20 +5,23 @@ module Katello
         class << self
           def deliver!
             SmartProxy.unscoped.with_content.each do |proxy|
-              if percentage < 90 && notification_already_exists?(proxy)
-                blueprint.notifications.where(subject: proxy).destroy_all
-              elsif update_notifications(proxy).empty? && percentage > 90
-                ::Notification.create!(
-                  :subject => proxy,
-                  :initiator => User.anonymous_admin,
-                  :audience => Notification::AUDIENCE_ADMIN,
-                  :message => ::UINotifications::StringParser.new(
-                    blueprint.message,
+              proxy.pulp_disk_usage.each do |storage_report|
+                percentage = storage_report[:percentage]
+                if percentage < 90 && notification_already_exists?(proxy)
+                  blueprint.notifications.where(subject: proxy).destroy_all
+                elsif update_notifications(proxy).empty? && percentage > 90
+                  ::Notification.create!(
                     :subject => proxy,
-                    :percentage => percentage
-                  ),
-                  :notification_blueprint => blueprint
-                )
+                    :initiator => User.anonymous_admin,
+                    :audience => Notification::AUDIENCE_ADMIN,
+                    :message => ::UINotifications::StringParser.new(
+                      blueprint.message,
+                      :subject => proxy,
+                      :percentage => percentage
+                    ),
+                    :notification_blueprint => blueprint
+                  )
+                end
               end
             end
           end
