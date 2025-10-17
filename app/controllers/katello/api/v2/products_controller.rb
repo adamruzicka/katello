@@ -2,6 +2,7 @@ module Katello
   class Api::V2::ProductsController < Api::V2::ApiController
     include Katello::Concerns::FilteredAutoCompleteSearch
 
+    before_action :find_product_for_show, :only => [:show]
     before_action :find_activation_key, :only => [:index]
     before_action :find_organization, :only => [:create, :index, :auto_complete_search]
     before_action :find_authorized_katello_resource, :only => [:update, :destroy, :sync]
@@ -90,7 +91,6 @@ module Katello
     param :organization_id, :number, :desc => N_("Organization ID")
     param :id, :number, :desc => N_("product numeric identifier"), :required => true
     def show
-      find_product(:includes => [{:root_repositories => {:repositories => :environment}}])
       respond_for_show(:resource => @product)
     end
 
@@ -147,6 +147,10 @@ module Katello
     end
 
     protected
+
+    def find_product_for_show
+      find_product(options: {includes: [{:root_repositories => {:repositories => :environment}}]})
+    end
 
     def find_product(options = {})
       @product = Product.includes(options[:includes] || []).readable.find_by(:id => params[:id])

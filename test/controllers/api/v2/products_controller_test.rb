@@ -144,7 +144,7 @@ module Katello
       allowed_perms = [@read_permission]
       denied_perms = [@update_permission, @create_permission, @delete_permission]
 
-      assert_protected_action(:show, allowed_perms, denied_perms) do
+      assert_protected_action(:show, allowed_perms, denied_perms, [@organization]) do
         get :show, params: { :id => @product.id }
       end
     end
