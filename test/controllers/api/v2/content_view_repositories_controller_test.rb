@@ -57,7 +57,7 @@ module Katello
       allowed_perms = [@read_permission]
       denied_perms = [@create_permission, @update_permission, @destroy_permission]
 
-      assert_protected_action(:show_all, allowed_perms, denied_perms) do
+      assert_protected_action(:show_all, allowed_perms, denied_perms, [@view.organization]) do
         get :show_all, params: { content_view_id: @view.id }
       end
     end

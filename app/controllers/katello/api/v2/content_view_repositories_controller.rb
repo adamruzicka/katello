@@ -43,7 +43,7 @@ module Katello
     private
 
     def find_content_view
-      @content_view = ContentView.find(params[:content_view_id])
+      @content_view = ContentView.authorized(:view_content_views).find(params[:content_view_id])
     end
 
     def find_organization_from_cv
